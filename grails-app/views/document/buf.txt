@@ -1,0 +1,1 @@
+<td>${fieldValue(bean: documentInstance, field: "status")}</td>

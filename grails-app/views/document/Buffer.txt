@@ -1,0 +1,14 @@
+<div class="fieldcontain ${hasErrors(bean: documentInstance, field: 'send', 'error')} required">
+	<label for="send">Отправлено </label>
+	<g:datePicker name="send" precision="minute"  value="${documentInstance?.send}"  />
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: documentInstance, field: 'recieve', 'error')} required">
+	<label for="recieve">Статус изменен </label>
+	<g:datePicker name="recieve" precision="minute"  value="${documentInstance?.recieve}"  />
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: documentInstance, field: 'status', 'error')} ">
+	<label for="status">Статус </label>
+	<g:select name="status" from="${documentInstance.constraints.status.inList}" value="${documentInstance?.status}" valueMessagePrefix="document.status" noSelection="['': '']"/>
+</div>

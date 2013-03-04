@@ -1,0 +1,110 @@
+
+package sender;
+
+/**
+*
+* @author murzus
+*/
+/*
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
+*/
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import javax.net.ssl.HttpsURLConnection;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+//import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+/**
+*
+* @author murz
+*/
+public class Sender {
+         //HashMap<String, String> information = new HashMap<String, String>();
+  private void doSend() {
+        BufferedReader in = null;
+        HttpsURLConnection conn = null;
+        OutputStreamWriter out = null;
+        PrintStream pr = null;
+        try {
+                 //from XMLFile To String
+            in = new BufferedReader(
+            new InputStreamReader(new FileInputStream("smsForSend.xml")));
+            String strBuf = "";
+            String line = null;
+            while ((line = in.readLine()) != null) {
+             strBuf += line;
+            }
+            in.close();
+                    //parse String To Document
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            Document doc = docBuilder.newDocument();
+            doc = docBuilder.parse(new InputSource(new StringReader(strBuf)));
+            String encStr =doc.getXmlEncoding();
+                   //if parse correct
+         if (encStr.equalsIgnoreCase("utf-8"))
+          {
+                  // Document to String
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StringWriter stringWriter = new StringWriter();
+            StreamResult result = new StreamResult(stringWriter);
+            transformer.transform(source, result);
+            String request = stringWriter.getBuffer().toString();
+            System.out.println(request);
+                  // Send the request
+            URL url = new URL("https://xml.sms16.ru/xml/");
+            conn = (HttpsURLConnection)url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "text/xml");
+            conn.setRequestProperty("charset", "utf-8");
+            out = new OutputStreamWriter(conn.getOutputStream());
+            out.write(request);
+            out.flush();
+            out.close();
+                       // Get the response
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            pr = new PrintStream(new BufferedOutputStream(
+                       new FileOutputStream("respond.txt", false)), false, "utf-8");
+            line = null;
+            while ((line = in.readLine()) != null) {
+                pr.println(line);
+            }
+            in.close();
+         }else {
+             System.out.println(" Ia oaaaony ?aniiciaou XML-oaee(Aicii?ii eiae?iaea ia utf-8)" );
+          }
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }finally{
+          if(pr!=null)pr.close();
+          if(conn!=null)conn.disconnect();
+         }
+    }
+  
+   public static void main(String[] args) {
+        Sender sender =new Sender();
+        sender.doSend();
+    }
+}
+
+
