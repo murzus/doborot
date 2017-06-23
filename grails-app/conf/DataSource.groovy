@@ -3,7 +3,7 @@ grails {
     host = "localhost"
     port = 27017 
     username = "user" 
-    password="####"
+    password="SuperP@ss"
     databaseName = "docsDB" 
   } 
 }
